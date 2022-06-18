@@ -4,12 +4,19 @@
   "description": "reactive Wiki server",
   "main": "index.js",
   "scripts": {
-    "start": "node src/app.js"
+    "start": "tsc && node dist/app.js"
   },
   "author": "IT-94",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/RomanPalamarhuk/reactiveProject/issues"
   },
-  "homepage": "https://github.com/RomanPalamarhuk/reactiveProject#readme"
+  "homepage": "https://github.com/RomanPalamarhuk/reactiveProject#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "tslint": "^5.12.1",
+    "typescript": "^3.3.3"
+  }
 }

@@ -1,25 +1,19 @@
-import express from'express';
-import path from 'path';
-import userRouter  from '../routes/users.js';
-
+import express from 'express';
+import userRouter from '../routes/users.js';
+import { getClient, startConnection } from '../dbClient/mongodb.js';
 const app = express();
 const PORT = 3000;
-const PAGE_DIR = 'public/index.html';
+const connectionString = 'mongodb://localhost:27017';
+
 app.listen(PORT, err => {
-    if(err) {
+    if (err) {
         return console.error(err);
     }
     return console.log(`server is running on port ${PORT}...`);
 });
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
-// all bottom is test
-app.use(express.static(path.resolve('static')));
-
-
+app.use(express.urlencoded({ extended: false }));
 
 app.use(userRouter);
-
-app.get('/api/:version', (req, res) => {
-    res.send(req.params.version);
-});
+const client = getClient(connectionString);
+startConnection(client);

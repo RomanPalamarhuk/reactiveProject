@@ -19,4 +19,28 @@ app.use(express.urlencoded({ extended: false }));
 app.use(userRouter);
 const client = getClient();
 startConnection(client);
-wikipediaListener();
+//wikipediaListener();
+// test();
+
+
+// async function test() {
+//     console.log("Test");
+//     const c = getClient();
+//     const users = c.db().collection('users');
+//     const user = await users.findOne({ user: 'roman' });
+//     let today = new Date();
+//     let day = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+//     if (user === undefined || user === null) {
+//         let mapS = new Map();
+//         mapS["1"] = 1;
+//         await users.insertOne({ user: "roman", date: day, count: 0, map: JSON.stringify(mapS)});
+//     }
+//     else {
+//         console.log("1");
+//         const myQuery =  {user: "roman", date: day};
+//         console.log("2");
+//         const newValues = { $set: {map: user.map["1"] + 1}};
+//         console.log("3");
+//         await users.updateOne(myQuery, newValues);
+//     }
+// }

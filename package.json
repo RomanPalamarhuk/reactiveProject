@@ -15,8 +15,8 @@
   },
   "homepage": "https://github.com/RomanPalamarhuk/reactiveProject#readme",
   "dependencies": {
+    "eventsource": "^2.0.2",
     "express": "^4.18.1",
-    "observable-event-source": "^1.0.1",
     "mongodb": "^4.7.0"
   },
   "devDependencies": {

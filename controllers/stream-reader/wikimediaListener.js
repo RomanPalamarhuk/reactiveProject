@@ -28,10 +28,7 @@ export function wikipediaListener() {
 async function addData(data) {
     const users = getClient().db().collection('users');
     const User = await users.findOne({ user: data.user, date: data.time});
-    console.log({ user: data.user, date: data.time, type: data.type, title: data.title });
-    console.log(User);
     if (User === null) {
-        console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZ");
         let types_map = new Map();
         types_map[data.type] = 0;
         let titles_map = new Map();
@@ -52,30 +49,6 @@ async function addData(data) {
         titles_map[data.title] += 1;
 
         const newValues = { $set: { type: types_map, title: titles_map}};
-        console.log("MAMU EBAL");
-        //console.log(User.count + 1);
         var resp = await users.updateOne(myQuery, newValues);
-        console.log(resp);
     }
 }
-// async function test() {
-//     console.log("Test");
-//     const c = getClient();
-//     const users = c.db().collection('users');
-//     const user = await users.findOne({ user: 'roman' });
-//     let today = new Date();
-//     let day = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-//     if (user === undefined || user === null) {
-//         let mapS = new Map();
-//         mapS["1"] = 1;
-//         await users.insertOne({ user: "roman", date: day, count: 0, map: JSON.stringify(mapS)});
-//     }
-//     else {
-//         console.log("1");
-//         const myQuery =  {user: "roman", date: day};
-//         console.log("2");
-//         const newValues = { $set: {map: user.map["1"] + 1}};
-//         console.log("3");
-//         await users.updateOne(myQuery, newValues);
-//     }
-// }

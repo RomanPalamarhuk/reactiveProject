@@ -1,16 +1,11 @@
 import EventSource from 'eventsource';
-import { Timestamp } from 'mongodb';
 import { getClient } from '../../dbClient/mongodb.js';
 
 const URL = 'https://stream.wikimedia.org/v2/stream/recentchange';
-const TIME_STAMPT = 10000;
 const eventSourse = new EventSource(URL);
 
 
 export function wikipediaListener() {
-    let promise_to_Save = [];
-    let recentTime = new Date().getTime();
-    const stream_file = getClient().db().collection('users');
     eventSourse.onopen = () => {
         console.info('Opened Connection');
     }
@@ -20,33 +15,47 @@ export function wikipediaListener() {
     }
     eventSourse.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        //console.log({ user: data.user, type: data.type, title: data.title, time: new Date(data.meta.dt) });
-        var current_date = new Date(data.meta.dt);
-        stream_file.insertOne({
-            user: data.user, type: data.type, title: data.title,
-            time: current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getDate()
-        });
-        // promise_to_Save.push(stream_file.insertOne({ user: data.user, type: data.type, title: data.title, 
-        //     time: current_date.getFullYear() + '-' + (current_date.getMonth() + 1)+ '-' + current_date.getDate()}));
-        //     if (new Date().getTime() - recentTime > TIME_STAMPT) {
-        //         recentTime = new Date().getTime();
-        //         let buffer = promise_to_Save;
-        //         promise_to_Save = [];
-        //         SaveToDb(buffer);
-        //     }
-        // }
+        let current_date = new Date(data.meta.dt);
+        if (data.bot === false) {
+            addData({
+                user: data.user, type: data.type, title: data.title,
+                time: current_date.getFullYear() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getDate()
+            });
+        }
     }
 }
 
-async function addData(data){
-    
-}
-async function SaveToDb(buffer) {
-    try {
-        await Promise.allSettled(buffer);
+async function addData(data) {
+    const users = getClient().db().collection('users');
+    const User = await users.findOne({ user: data.user, date: data.time});
+    console.log({ user: data.user, date: data.time, type: data.type, title: data.title });
+    console.log(User);
+    if (User === null) {
+        console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZ");
+        let types_map = new Map();
+        types_map[data.type] = 0;
+        let titles_map = new Map();
+        titles_map[data.title] = 0;
+        await users.insertOne({ user: data.user, date: data.time, type: types_map, title: titles_map });
     }
-    catch (e) {
-        console.log("Error" + e);
+    else {
+        const myQuery = { user: data.user, date: data.time};
+        let types_map = User.type;
+        if(types_map[data.type] === null || types_map[data.type] === undefined){
+            types_map[data.type] = 0;
+        }
+        types_map[data.type] += 1;
+        let titles_map = User.title;
+        if(titles_map[data.title] === null || titles_map[data.title] === undefined){
+            titles_map[data.title] = 0;
+        }
+        titles_map[data.title] += 1;
+
+        const newValues = { $set: { type: types_map, title: titles_map}};
+        console.log("MAMU EBAL");
+        //console.log(User.count + 1);
+        var resp = await users.updateOne(myQuery, newValues);
+        console.log(resp);
     }
 }
 // async function test() {

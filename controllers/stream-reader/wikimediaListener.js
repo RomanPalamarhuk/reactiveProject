@@ -10,7 +10,7 @@ const eventSourse = new EventSource(URL);
 export function wikipediaListener() {
     let promise_to_Save = [];
     let recentTime = new Date().getTime();
-    const stream_file = getClient().db().collection('dataStream');
+    const stream_file = getClient().db().collection('users');
     eventSourse.onopen = () => {
         console.info('Opened Connection');
     }
@@ -20,8 +20,10 @@ export function wikipediaListener() {
     }
     eventSourse.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log({user: data.user, type: data.type, title: data.title, time: new Date(data.meta.dt)});
-        promise_to_Save.push(stream_file.insertOne({user: data.user, type: data.type, title: data.title, time: new Date(data.meta.dt)}));
+        //console.log({ user: data.user, type: data.type, title: data.title, time: new Date(data.meta.dt) });
+        var current_date = new Date(data.meta.dt);
+        promise_to_Save.push(stream_file.insertOne({ user: data.user, type: data.type, title: data.title, 
+            time: current_date.getFullYear() + '-' + (current_date.getMonth() + 1)+ '-' + current_date.getDate()}));
         if (new Date().getTime() - recentTime > TIME_STAMPT) {
             recentTime = new Date().getTime();
             let buffer = promise_to_Save;
@@ -40,3 +42,4 @@ async function SaveToDb(buffer) {
         console.log("Error" + e);
     }
 }
+//current_date.getFullYear() + '-' + (current_date.getMonth() + 1)+ '-' + current_date.getDate()

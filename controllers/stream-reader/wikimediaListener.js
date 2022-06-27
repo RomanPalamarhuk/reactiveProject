@@ -1,5 +1,5 @@
 import EventSource from 'eventsource';
-import { getClient } from '../../dbClient/mongodb.js';
+import { getLocalClient } from '../../dbClient/mongodb.js';
 
 const URL = 'https://stream.wikimedia.org/v2/stream/recentchange';
 const eventSourse = new EventSource(URL);
@@ -26,7 +26,7 @@ export function wikipediaListener() {
 }
 
 async function addData(data) {
-    const users = getClient().db().collection('users');
+    const users = getLocalClient().db().collection('users');
     const User = await users.findOne({ user: data.user, date: data.time});
     if (User === null) {
         let types_map = new Map();
@@ -49,6 +49,6 @@ async function addData(data) {
         titles_map[data.title] += 1;
 
         const newValues = { $set: { type: types_map, title: titles_map}};
-        var resp = await users.updateOne(myQuery, newValues);
+        await users.updateOne(myQuery, newValues);
     }
 }
